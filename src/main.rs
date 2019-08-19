@@ -19,6 +19,15 @@ fn sphere_trace(orig: Vec3d, dir: Vec3d, pos: &mut Vec3d) -> bool {
     false
 }
 
+fn distance_field_normal(pos: Vec3d) -> Vec3d {
+    let eps = 0.1;
+    let d = signed_distance(&pos);
+    let nx = signed_distance(&(pos + Vec3d::new(eps, 0., 0.))) - d;
+    let ny = signed_distance(&(pos + Vec3d::new(0., eps, 0.))) - d;
+    let nz = signed_distance(&(pos + Vec3d::new(0., 0., eps))) - d;
+    Vec3d::new(nx, ny, nz).normalized()
+}
+
 fn main() {
     const WIDTH: usize = 640;
     const HEIGHT: usize = 480;
@@ -41,7 +50,9 @@ fn main() {
                 Vec3d::new(dir_x, dir_y, dir_z).normalized(),
                 &mut hit,
             ) {
-                framebuffer[i + j * WIDTH] = Vec3d::new(1., 1., 1.);
+                let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
+                let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
+                framebuffer[i + j * WIDTH] = Vec3d::new(1., 1., 1.) * light_intensity;
             } else {
                 framebuffer[i + j * WIDTH] = Vec3d::new(0.2, 0.7, 0.8);
             }
