@@ -5,9 +5,7 @@ const SPHERE_RADIUS: f64 = 1.5;
 const NOISE_AMPLITUDE: f64 = 0.2;
 
 fn signed_distance(p: &Vec3d) -> f64 {
-    // p.length() - SPHERE_RADIUS
-    let s = p.normalized_by(SPHERE_RADIUS);
-    let displacement = (16. * s.x).sin() * (16. * s.y).sin() * (16. * s.z).sin() * NOISE_AMPLITUDE;
+    let displacement = (16. * p.x).sin() * (16. * p.y).sin() * (16. * p.z).sin() * NOISE_AMPLITUDE;
     p.length() - (SPHERE_RADIUS + displacement)
 }
 
