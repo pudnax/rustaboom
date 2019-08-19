@@ -16,7 +16,7 @@ Cargo.lock
 
 /target
 #**/*.rs.bk
-out*.ppm
+out.ppm
 *.cpp
 *.h
 boom
