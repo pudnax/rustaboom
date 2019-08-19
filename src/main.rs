@@ -19,7 +19,7 @@ fn palette_fire(d: f64) -> Vec3d {
     } else if x < 0.75 {
         return vec3d::lerp(red, orange, x * 4. - 2.);
     }
-    vec3d::lerp(orange, yellow, x * 4. - 3.)
+    vec3d::lerp(orange, yellow, x * 4. - 4.)
 }
 
 fn lerp(v0: f64, v1: f64, d: f64) -> f64 {
@@ -34,7 +34,7 @@ fn hash(n: f64) -> f64 {
 fn noise(x: &Vec3d) -> f64 {
     let p = Vec3d::new(x.x.floor(), x.y.floor(), x.z.floor());
     let mut f = Vec3d::new(x.x - p.x, x.y - p.y, x.z - p.z);
-    f = f * (f * (Vec3d::new(3., 3., 3.) - f * 2.));
+    f = f * (f.dot(Vec3d::new(3., 3., 3.) - f * 2.));
     let n = p.dot(Vec3d::new(1., 57., 113.));
     lerp(
         lerp(
@@ -78,9 +78,9 @@ fn signed_distance(p: &Vec3d) -> f64 {
 }
 
 fn sphere_trace(orig: Vec3d, dir: Vec3d, pos: &mut Vec3d) -> bool {
-    // if orig.dot(orig) - (orig.dot(dir)).powi(2) > SPHERE_RADIUS.powi(2) {
-    //     return false;
-    // } // early discard
+    if orig.dot(orig) - (orig.dot(dir)).powi(2) > SPHERE_RADIUS.powi(2) {
+        return false;
+    } // early discard
 
     *pos = orig;
     for _i in 0..128 {
@@ -128,7 +128,7 @@ fn main() {
                 let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
                 let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
                 framebuffer[i + j * WIDTH] =
-                    palette_fire((-0.2 + noise_level) * 2.) * light_intensity;
+                    palette_fire((-0.25 + noise_level) * 2.) * light_intensity;
             } else {
                 framebuffer[i + j * WIDTH] = Vec3d::new(0.2, 0.7, 0.8);
             }

@@ -204,10 +204,10 @@ impl Sub<f64> for Vec3d {
 }
 
 impl Mul for Vec3d {
-    type Output = Vec3d;
+    type Output = f64;
 
-    fn mul(self, other: Vec3d) -> Vec3d {
-        Vec3d::new(self.x * other.x, self.y * other.y, self.z * other.z)
+    fn mul(self, other: Vec3d) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
 
