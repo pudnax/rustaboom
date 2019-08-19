@@ -2,9 +2,13 @@ mod vec3d;
 use vec3d::Vec3d;
 
 const SPHERE_RADIUS: f64 = 1.5;
+const NOISE_AMPLITUDE: f64 = 0.2;
 
 fn signed_distance(p: &Vec3d) -> f64 {
-    p.length() - SPHERE_RADIUS
+    // p.length() - SPHERE_RADIUS
+    let s = p.normalized_by(SPHERE_RADIUS);
+    let displacement = (16. * s.x).sin() * (16. * s.y).sin() * (16. * s.z).sin() * NOISE_AMPLITUDE;
+    p.length() - (SPHERE_RADIUS + displacement)
 }
 
 fn sphere_trace(orig: Vec3d, dir: Vec3d, pos: &mut Vec3d) -> bool {
@@ -52,10 +56,7 @@ fn main() {
             ) {
                 let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
                 let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
-                let displacement =
-                    ((16. * hit.x).sin() * (16. * hit.y).sin() * (16. * hit.z).sin() + 1.) / 2.;
-                framebuffer[i + j * WIDTH] =
-                    Vec3d::new(1., 1., 1.) * displacement * light_intensity;
+                framebuffer[i + j * WIDTH] = Vec3d::new(1., 1., 1.) * light_intensity;
             } else {
                 framebuffer[i + j * WIDTH] = Vec3d::new(0.2, 0.7, 0.8);
             }

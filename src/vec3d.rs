@@ -102,6 +102,11 @@ impl Vec3d {
         Vec3d::new(self.x * scale, self.y * scale, self.z * scale)
     }
 
+    pub fn normalized_by(&self, frac: f64) -> Vec3d {
+        let scale = frac / self.length();
+        Vec3d::new(self.x * scale, self.y * scale, self.z * scale)
+    }
+
     pub fn dot(&self, vec: Vec3d) -> f64 {
         self.x * vec.x + self.y * vec.y + self.z * vec.z
     }
