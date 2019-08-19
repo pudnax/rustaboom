@@ -3,7 +3,7 @@ use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 use std::{cmp, fmt};
 
 pub fn lerp(a: Vec3d, b: Vec3d, d: f64) -> Vec3d {
-    a + (b - a).normalized() * d
+    a + (b - a) * 1f64.min(0f64.max(d))
 }
 
 #[derive(Copy, Clone)]
@@ -72,7 +72,7 @@ impl Vec3d {
     }
 
     pub fn lerp(v1: Vec3d, v2: Vec3d, alpha: f64) -> Vec3d {
-        v1 + (v2 - v1) * alpha
+        v1 + (v2 - v1) * 1f64.min(0f64.max(alpha))
     }
 
     pub fn clamp(&self, min: f64, max: f64) -> Vec3d {

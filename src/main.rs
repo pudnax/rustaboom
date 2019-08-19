@@ -4,6 +4,24 @@ use vec3d::Vec3d;
 const SPHERE_RADIUS: f64 = 1.5;
 const NOISE_AMPLITUDE: f64 = 1.;
 
+fn palette_fire(d: f64) -> Vec3d {
+    let yellow = Vec3d::new(1.7, 1.3, 1.0); // note that the color is "hot", i.e. has components >1
+    let orange = Vec3d::new(1.0, 0.6, 0.0);
+    let red = Vec3d::new(1.0, 0.0, 0.0);
+    let darkgray = Vec3d::new(0.2, 0.2, 0.2);
+    let gray = Vec3d::new(0.4, 0.4, 0.4);
+
+    let x = 0f64.max(1f64.min(d));
+    if x < 0.25 {
+        return vec3d::lerp(gray, darkgray, x * 4.);
+    } else if x < 0.5 {
+        return vec3d::lerp(darkgray, red, x * 4. - 1.);
+    } else if x < 0.75 {
+        return vec3d::lerp(red, orange, x * 4. - 2.);
+    }
+    vec3d::lerp(orange, yellow, x * 4. - 3.)
+}
+
 fn lerp(v0: f64, v1: f64, d: f64) -> f64 {
     v0 + (v1 - v0) * 0f64.max(1f64.min(d))
 }
@@ -60,9 +78,9 @@ fn signed_distance(p: &Vec3d) -> f64 {
 }
 
 fn sphere_trace(orig: Vec3d, dir: Vec3d, pos: &mut Vec3d) -> bool {
-    if orig.dot(orig) - (orig.dot(dir)).powi(2) > SPHERE_RADIUS.powi(2) {
-        return false;
-    } // early discard
+    // if orig.dot(orig) - (orig.dot(dir)).powi(2) > SPHERE_RADIUS.powi(2) {
+    //     return false;
+    // } // early discard
 
     *pos = orig;
     for _i in 0..128 {
@@ -106,9 +124,11 @@ fn main() {
                 Vec3d::new(dir_x, dir_y, dir_z).normalized(),
                 &mut hit,
             ) {
+                let noise_level = (SPHERE_RADIUS - hit.length()) / NOISE_AMPLITUDE;
                 let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
                 let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
-                framebuffer[i + j * WIDTH] = Vec3d::new(1., 1., 1.) * light_intensity;
+                framebuffer[i + j * WIDTH] =
+                    palette_fire((-0.2 + noise_level) * 2.) * light_intensity;
             } else {
                 framebuffer[i + j * WIDTH] = Vec3d::new(0.2, 0.7, 0.8);
             }
