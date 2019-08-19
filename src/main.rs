@@ -52,7 +52,10 @@ fn main() {
             ) {
                 let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
                 let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
-                framebuffer[i + j * WIDTH] = Vec3d::new(1., 1., 1.) * light_intensity;
+                let displacement =
+                    ((16. * hit.x).sin() * (16. * hit.y).sin() * (16. * hit.z).sin() + 1.) / 2.;
+                framebuffer[i + j * WIDTH] =
+                    Vec3d::new(1., 1., 1.) * displacement * light_intensity;
             } else {
                 framebuffer[i + j * WIDTH] = Vec3d::new(0.2, 0.7, 0.8);
             }
