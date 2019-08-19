@@ -2,14 +2,68 @@ mod vec3d;
 use vec3d::Vec3d;
 
 const SPHERE_RADIUS: f64 = 1.5;
-const NOISE_AMPLITUDE: f64 = 0.2;
+const NOISE_AMPLITUDE: f64 = 1.;
+
+fn lerp(v0: f64, v1: f64, d: f64) -> f64 {
+    v0 + (v1 - v0) * 0f64.max(1f64.min(d))
+}
+
+fn hash(n: f64) -> f64 {
+    let x = n.sin() * 43758.5453;
+    x - x.floor()
+}
+
+fn noise(x: &Vec3d) -> f64 {
+    let p = Vec3d::new(x.x.floor(), x.y.floor(), x.z.floor());
+    let mut f = Vec3d::new(x.x - p.x, x.y - p.y, x.z - p.z);
+    f = f * (f * (Vec3d::new(3., 3., 3.) - f * 2.));
+    let n = p.dot(Vec3d::new(1., 57., 113.));
+    lerp(
+        lerp(
+            lerp(hash(n + 0.), hash(n + 1.), f.x),
+            lerp(hash(n + 57.), hash(n + 58.), f.x),
+            f.y,
+        ),
+        lerp(
+            lerp(hash(n + 113.), hash(n + 114.), f.x),
+            lerp(hash(n + 170.), hash(n + 171.), f.x),
+            f.y,
+        ),
+        f.z,
+    )
+}
+
+fn rotate(v: &Vec3d) -> Vec3d {
+    Vec3d::new(
+        Vec3d::new(0., 0.8, 0.6).dot(*v),
+        Vec3d::new(-0.80, 0.36, -0.48).dot(*v),
+        Vec3d::new(-0.60, -0.48, 0.64).dot(*v),
+    )
+}
+
+fn fractal_brownian_motion(x: &Vec3d) -> f64 {
+    let mut p = rotate(x);
+    let mut f = 0.;
+    f += 0.5000 * noise(&p);
+    p = p * 2.32;
+    f += 0.2500 * noise(&p);
+    p = p * 3.03;
+    f += 0.1250 * noise(&p);
+    p = p * 2.61;
+    f += 0.0625 * noise(&p);
+    f / 0.9375
+}
 
 fn signed_distance(p: &Vec3d) -> f64 {
-    let displacement = (16. * p.x).sin() * (16. * p.y).sin() * (16. * p.z).sin() * NOISE_AMPLITUDE;
+    let displacement = -fractal_brownian_motion(&(*p * 3.4)) * NOISE_AMPLITUDE;
     p.length() - (SPHERE_RADIUS + displacement)
 }
 
 fn sphere_trace(orig: Vec3d, dir: Vec3d, pos: &mut Vec3d) -> bool {
+    if orig.dot(orig) - (orig.dot(dir)).powi(2) > SPHERE_RADIUS.powi(2) {
+        return false;
+    } // early discard
+
     *pos = orig;
     for _i in 0..128 {
         let d = signed_distance(pos);
