@@ -106,10 +106,10 @@ fn distance_field_normal(pos: Vec3d) -> Vec3d {
 }
 
 fn main() {
-    const WIDTH: usize = 640;
-    const HEIGHT: usize = 480;
+    const WIDTH: usize = 960;
+    const HEIGHT: usize = 720;
     let fov = std::f64::consts::PI / 3.;
-    let framebuffer = &mut [Vec3d::new(0., 0., 0.); WIDTH * HEIGHT];
+    let framebuffer = &mut vec![Vec3d::new(0., 0., 0.); WIDTH * HEIGHT];
 
     let w = WIDTH as f64;
     let h = HEIGHT as f64;
