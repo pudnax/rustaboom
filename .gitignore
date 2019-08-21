@@ -21,4 +21,4 @@ out.ppm
 *.h
 boom
 .*
-rustaboom
+rustaboom*

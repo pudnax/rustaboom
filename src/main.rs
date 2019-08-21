@@ -114,29 +114,26 @@ fn main() {
     let w = WIDTH as f64;
     let h = HEIGHT as f64;
 
-    framebuffer
-        .par_iter_mut()
-        .enumerate()
-        .for_each(|(idx, frame)| {
-            let id = (idx % WIDTH) as f64;
-            let jd = (idx / WIDTH) as f64;
-            let dir_x: f64 = (id + 0.5) - w / 2.;
-            let dir_y: f64 = -(jd + 0.5) + h / 2.;
-            let dir_z: f64 = -h / (2. * (fov / 2.).tan());
-            let mut hit = Vec3d::new(0., 0., 0.);
-            if sphere_trace(
-                [0., 0., 3.].into(),
-                Vec3d::new(dir_x, dir_y, dir_z).normalized(),
-                &mut hit,
-            ) {
-                let noise_level = (SPHERE_RADIUS - hit.length()) / NOISE_AMPLITUDE;
-                let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
-                let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
-                *frame = palette_fire((-0.25 + noise_level) * 2.) * light_intensity;
-            } else {
-                *frame = Vec3d::new(0.2, 0.7, 0.8);
-            }
-        });
+    for (idx, frame) in framebuffer.iter_mut().enumerate() {
+        let id = (idx % WIDTH) as f64;
+        let jd = (idx / WIDTH) as f64;
+        let dir_x: f64 = (id + 0.5) - w / 2.;
+        let dir_y: f64 = -(jd + 0.5) + h / 2.;
+        let dir_z: f64 = -h / (2. * (fov / 2.).tan());
+        let mut hit = Vec3d::new(0., 0., 0.);
+        if sphere_trace(
+            [0., 0., 3.].into(),
+            Vec3d::new(dir_x, dir_y, dir_z).normalized(),
+            &mut hit,
+        ) {
+            let noise_level = (SPHERE_RADIUS - hit.length()) / NOISE_AMPLITUDE;
+            let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
+            let light_intensity = 0.4f64.max(light_dir.dot(distance_field_normal(hit)));
+            *frame = palette_fire((-0.25 + noise_level) * 2.) * light_intensity;
+        } else {
+            *frame = Vec3d::new(0.2, 0.7, 0.8);
+        }
+    }
 
     use std::io::prelude::Write;
     let mut file = std::io::BufWriter::new(std::fs::File::create("out_r.ppm").unwrap());
