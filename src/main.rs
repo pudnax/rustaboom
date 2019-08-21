@@ -1,3 +1,6 @@
+extern crate rayon;
+use rayon::prelude::*;
+
 mod vec3d;
 use vec3d::Vec3d;
 
