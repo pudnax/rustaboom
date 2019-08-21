@@ -117,7 +117,7 @@ fn main() {
     framebuffer
         .par_iter_mut()
         .enumerate()
-        .map(|(idx, frame)| {
+        .for_each(|(idx, frame)| {
             let id = (idx % WIDTH) as f64;
             let jd = (idx / WIDTH) as f64;
             let dir_x: f64 = (id + 0.5) - w / 2.;
@@ -136,8 +136,7 @@ fn main() {
             } else {
                 *frame = Vec3d::new(0.2, 0.7, 0.8);
             }
-        })
-        .collect::<Vec<_>>();
+        });
 
     use std::io::prelude::Write;
     let mut file = std::io::BufWriter::new(std::fs::File::create("out_r.ppm").unwrap());
