@@ -5,7 +5,7 @@ mod vec3d;
 use vec3d::Vec3d;
 
 const SPHERE_RADIUS: f64 = 1.5;
-const NOISE_AMPLITUDE: f64 = 0.7;
+const NOISE_AMPLITUDE: f64 = 1.;
 
 fn palette_fire(d: f64) -> Vec3d {
     let yellow = Vec3d::new(1.7, 1.3, 1.0); // note that the color is "hot", i.e. has components >1
@@ -114,44 +114,38 @@ fn main() {
     let w = WIDTH as f64;
     let h = HEIGHT as f64;
 
-
-        framebuffer
-            .par_iter_mut()
-            .enumerate()
-            .for_each(|(idx, frame)| {
-                let id = (idx % WIDTH) as f64;
-                let jd = (idx / WIDTH) as f64;
-                let dir_x: f64 = (id + 0.5) - w / 2.;
-                let dir_y: f64 = -(jd + 0.5) + h / 2.;
-                let dir_z: f64 = -h / (2. * (fov / 2.).tan());
-                let mut hit = Vec3d::new(0., 0., 0.);
-                if sphere_trace(
-                    [0., 0., 3.].into(),
-                    Vec3d::new(dir_x, dir_y, dir_z).normalized(),
-                    &mut hit,
-                    
-                ) {
-                    let noise_level = (SPHERE_RADIUS - hit.length()) / NOISE_AMPLITUDE;
-                    let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
-                    let light_intensity = (light_dir * distance_field_normal(hit)).max(0.4);
-                    *frame = palette_fire((-0.2 + noise_level) * 2.) * light_intensity;
-                } else {
-                    *frame = Vec3d::new(0.2, 0.7, 0.8);
-                }
-            });
-
-        use std::io::prelude::Write;
-        let mut file = std::io::BufWriter::new(
-            std::fs::File::create("out_r.ppm").unwrap(),
-        );
-        file.write_all(&format!("P6\n{} {}\n255\n", WIDTH, HEIGHT).as_bytes())
-            .unwrap();
-        for frame in framebuffer.iter() {
-            for j in 0..3 {
-                let pixel = ((255. * frame[j]) as i64).min(255).max(0) as u8;
-                file.write_all(&[pixel]).unwrap();
+    framebuffer
+        .par_iter_mut()
+        .enumerate()
+        .for_each(|(idx, frame)| {
+            let id = (idx % WIDTH) as f64;
+            let jd = (idx / WIDTH) as f64;
+            let dir_x: f64 = (id + 0.5) - w / 2.;
+            let dir_y: f64 = -(jd + 0.5) + h / 2.;
+            let dir_z: f64 = -h / (2. * (fov / 2.).tan());
+            let mut hit = Vec3d::new(0., 0., 0.);
+            if sphere_trace(
+                [0., 0., 3.].into(),
+                Vec3d::new(dir_x, dir_y, dir_z).normalized(),
+                &mut hit,
+            ) {
+                let noise_level = (SPHERE_RADIUS - hit.length()) / NOISE_AMPLITUDE;
+                let light_dir = (Vec3d::new(10., 10., 10.) - hit).normalized();
+                let light_intensity = (light_dir * distance_field_normal(hit)).max(0.4);
+                *frame = palette_fire((-0.2 + noise_level) * 2.) * light_intensity;
+            } else {
+                *frame = Vec3d::new(0.2, 0.7, 0.8);
             }
-        }
+        });
 
-    
+    use std::io::prelude::Write;
+    let mut file = std::io::BufWriter::new(std::fs::File::create("out_r.ppm").unwrap());
+    file.write_all(&format!("P6\n{} {}\n255\n", WIDTH, HEIGHT).as_bytes())
+        .unwrap();
+    for frame in framebuffer.iter() {
+        for j in 0..3 {
+            let pixel = ((255. * frame[j]) as i64).min(255).max(0) as u8;
+            file.write_all(&[pixel]).unwrap();
+        }
+    }
 }
