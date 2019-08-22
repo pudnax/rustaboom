@@ -3,7 +3,7 @@ use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 use std::{cmp, fmt};
 
 pub fn lerp(a: Vec3d, b: Vec3d, d: f64) -> Vec3d {
-    a + (b - a) * 1f64.min(0f64.max(d))
+    a + (b - a) * d.max(0.).min(1.)
 }
 
 #[derive(Copy, Clone)]
@@ -44,15 +44,8 @@ impl Vec3d {
         }
     }
 
-    pub fn eucl(x: impl Scalar, y: impl Scalar, z: impl Scalar) -> f64 {
-        let x = x.float();
-        let y = y.float();
-        let z = z.float();
-        (x * x + y * y + z * z).sqrt()
-    }
-
     pub fn length(&self) -> f64 {
-        Vec3d::eucl(self.x, self.y, self.z)
+        eucl(self.x, self.y, self.z)
     }
 
     pub fn length_squared(&self) -> f64 {
@@ -72,7 +65,7 @@ impl Vec3d {
     }
 
     pub fn lerp(v1: Vec3d, v2: Vec3d, alpha: f64) -> Vec3d {
-        v1 + (v2 - v1) * 1f64.min(0f64.max(alpha))
+        v1 + (v2 - v1) * alpha.max(0.).min(1.)
     }
 
     pub fn clamp(&self, min: f64, max: f64) -> Vec3d {
@@ -87,11 +80,11 @@ impl Vec3d {
         let dx = self.x - v.x;
         let dy = self.y - v.y;
         let dz = self.z - v.z;
-        (dx * dx + dy * dy + dz * dz).sqrt()
+        eucl(dx, dy, dz)
     }
 
     pub fn normalize(&mut self) {
-        let norm = Vec3d::eucl(self.x, self.y, self.z);
+        let norm = eucl(self.x, self.y, self.z);
         self.x /= norm;
         self.y /= norm;
         self.z /= norm;
@@ -148,7 +141,6 @@ impl Vec3d {
         )
     }
 
-    ///Get a Vec3d with the maximum of each component of this and another Vec3d
     pub fn max(self, other: impl Into<Vec3d>) -> Vec3d {
         let other = other.into();
         Vec3d::new(
@@ -161,6 +153,13 @@ impl Vec3d {
     pub fn as_slice(&self) -> [f64; 3] {
         [self.x, self.y, self.z]
     }
+}
+
+pub fn eucl(x: impl Scalar, y: impl Scalar, z: impl Scalar) -> f64 {
+    let x = x.float();
+    let y = y.float();
+    let z = z.float();
+    (x * x + y * y + z * z).sqrt()
 }
 
 impl AddAssign for Vec3d {
