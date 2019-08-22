@@ -2,7 +2,7 @@ mod vec3d;
 use vec3d::Vec3d;
 
 const SPHERE_RADIUS: f64 = 1.5;
-const NOISE_AMPLITUDE: f64 = 0.7;
+const NOISE_AMPLITUDE: f64 = 1.;
 
 fn palette_fire(d: f64) -> Vec3d {
     let yellow = Vec3d::new(1.7, 1.3, 1.0); // note that the color is "hot", i.e. has components >1
