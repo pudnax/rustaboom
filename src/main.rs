@@ -83,7 +83,7 @@ fn signed_distance(p: Vec3d) -> f64 {
 fn sphere_trace(orig: Vec3d, dir: Vec3d, pos: &mut Vec3d) -> bool {
     if orig * orig - (orig * dir).powi(2) > SPHERE_RADIUS.powi(2) {
         return false;
-    } // early discard
+    }
 
     *pos = orig;
     for _i in 0..128 {
