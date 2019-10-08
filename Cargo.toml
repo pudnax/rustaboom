@@ -1,6 +1,6 @@
 [package]
 name = "rustaboom"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["komm <k.a.komissar@gmail.com>"]
 edition = "2018"
 
