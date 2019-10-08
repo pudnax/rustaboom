@@ -23,3 +23,7 @@ boom
 .*
 rustaboom
 for_gif*
+rustaboom_par_iter_foreach
+rustaboom_par_iter_map
+rustaboom_par_iter_foreach
+boom*.gif
