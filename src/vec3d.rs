@@ -14,16 +14,6 @@ pub struct Vec3d {
 }
 
 impl Vec3d {
-    pub fn x(&self) -> f64 {
-        self.x
-    }
-    pub fn y(&self) -> f64 {
-        self.y
-    }
-    pub fn z(&self) -> f64 {
-        self.z
-    }
-
     pub fn x_comp(self) -> Vec3d {
         Vec3d::new(self.x, 0., 0.)
     }
