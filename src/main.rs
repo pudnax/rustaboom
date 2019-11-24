@@ -19,6 +19,7 @@ fn palette_fire(d: f64) -> Vec3d {
     } else if x < 0.75 {
         return vec3d::lerp(red, orange, x * 4. - 2.);
     }
+
     vec3d::lerp(orange, yellow, x * 4. - 3.)
 }
 
