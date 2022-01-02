@@ -137,7 +137,7 @@ fn main() {
         }
         use std::io::prelude::Write;
         let mut file = std::io::BufWriter::new(std::fs::File::create("out_r.ppm").unwrap());
-        file.write_all(&format!("P6\n{} {}\n255\n", WIDTH, HEIGHT).as_bytes())
+        file.write_all(format!("P6\n{} {}\n255\n", WIDTH, HEIGHT).as_bytes())
             .unwrap();
         for frame in framebuffer.iter() {
             for j in 0..3 {
